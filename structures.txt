@@ -1,0 +1,29 @@
+src/
+|-- components/
+|   |-- admin/
+|   |   |-- AdminDashboard.jsx
+|   |   |-- AdminSettings.jsx
+|   |   |-- UserManagement.jsx
+|   |
+|   |-- coach/
+|   |   |-- CoachDashboard.jsx
+|   |   |-- TrainingPlans.jsx
+|   |   |-- PerformanceReview.jsx
+|   |
+|   |-- athlete/
+|   |   |-- AthleteDashboard.jsx
+|   |   |-- ProgressTracker.jsx
+|   |   |-- Schedule.jsx
+|   |
+|   |-- shared/
+|   |   |-- Header.jsx
+|   |   |-- Sidebar.jsx
+|   |   |-- Chart.jsx
+|
+|-- pages/
+|   |-- AdminPage.jsx
+|   |-- CoachPage.jsx
+|   |-- AthletePage.jsx
+|
+|-- App.jsx
+|-- index.js
