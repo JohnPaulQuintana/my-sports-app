@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
 
-export default function MobileSidebar() {
+export default function MobileSidebar({setActiveTab}) {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState({});
 
@@ -25,7 +25,7 @@ export default function MobileSidebar() {
             const token = JSON.parse(localStorage.getItem("sport-science-token"));
             if (!token) return;
 
-            const response = await fetch(`${API_BASE_URL}/api/logout`, {
+            const response = await fetch(`${API_BASE_URL}/api/${token.user?.role}/logout`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -66,10 +66,10 @@ export default function MobileSidebar() {
                 </div>
                 {getUserRole() === 'admin' && (
                     <nav className="p-4">
-                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
-                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Sports</a>
-                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Accounts</a>
-                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a>
+                        <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
+                        <a onClick={() => setActiveTab("sports")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Sports</a>
+                        <a onClick={() => setActiveTab("accounts")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Accounts</a>
+                        {/* <a onClick={() => setActiveTab("athletes")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
                 )}

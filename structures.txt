@@ -27,3 +27,13 @@ src/
 |
 |-- App.jsx
 |-- index.js
+
+
+Database Design
+Here’s how the relationships should work:
+1.Admin creates sports (e.g., Volleyball, Basketball).
+2.Admin assigns a coach to a sport.
+3.Coaches can add athletes to their assigned sport.
+4.Users Table stores admin, coach, and athlete accounts.
+5.Sport Assignments Table links coaches and athletes to sports.
+
