@@ -3,7 +3,7 @@ const SportCard = ({ sport }) => {
   return (
     <div className="bg-white border shadow-lg rounded-lg p-4 mt-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-700">{sport.name}</h2>
+        <h2 className="text-xl font-bold text-primary">{sport.name}</h2>
         <span
           className={`mt-2 inline-block px-2 rounded-full text-sm ${
             sport.status === "active"
