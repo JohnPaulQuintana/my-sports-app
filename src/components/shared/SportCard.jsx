@@ -1,4 +1,7 @@
 import React from "react";
+const API_BASE_URL =
+  import.meta.env.VITE_FRONTEND_Image_URL || "http://127.0.0.1:8001";
+  
 const SportCard = ({ sport }) => {
   return (
     <div className="bg-white border shadow-lg rounded-lg p-4 mt-4">
@@ -16,7 +19,7 @@ const SportCard = ({ sport }) => {
       </div>
       {sport.image ? (
         <img
-          src={sport.image}
+          src={`${API_BASE_URL}/${sport.image}`}
           alt={sport.name}
           className="w-full h-40 object-cover mt-2 rounded-lg"
         />
