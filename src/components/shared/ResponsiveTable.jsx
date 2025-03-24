@@ -10,13 +10,13 @@ export default function ResponsiveTable({ columns, data, rowsPerPage = 5,actions
   const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-max w-full border-collapse border border-gray-200 bg-white">
+    <div className="w-[100%] overflow-x-auto border">
+      <table className="w-full border-collapse border border-gray-200 bg-white">
         {/* Table Header */}
         <thead className="bg-gray-100">
           <tr>
             {columns.map((column, index) => (
-              <th key={index} className="px-4 py-2 text-left text-gray-700 text-sm font-semibold border w-32">
+              <th key={index} className="px-6 py-3 text-left text-sm font-bold text-color-dark uppercase">
                 {column.label}
               </th>
             ))}
@@ -30,7 +30,7 @@ export default function ResponsiveTable({ columns, data, rowsPerPage = 5,actions
             currentData.map((row, rowIndex) => (
               <tr key={rowIndex} className="hover:bg-gray-50 border-b">
                 {columns.map((column, colIndex) => (
-                  <td key={colIndex} className="px-4 py-2 border text-sm">
+                  <td key={colIndex} className="p-2 whitespace-nowrap text-sm">
                     {column.key === "descriptions" ? (
                       <div className="max-w-xs truncate" title={row[column.key]}>
                         {row[column.key]}

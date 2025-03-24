@@ -6,6 +6,7 @@ import ResponsiveTable from "../shared/ResponsiveTable";
 import CreateSportModal from "../shared/CreateSportModal";
 import Swal from "sweetalert2";
 import UserAccountModal from "../shared/UserAccountModal";
+import UserCard from "../shared/UserCard";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
@@ -19,18 +20,21 @@ const AdminDashboard = () => {
   const [summary, setTotalSummary] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTermSp, setSearchTermSp] = useState("");
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-  
+
   const handleOpenModalAccount = () => setIsModalOpenAccount(true);
   const handleCloseModalAccount = () => setIsModalOpenAccount(false);
 
   //   create users account
   const handleCreateUserAccount = async (newUser) => {
+    console.log(newUser);
     try {
-      const token = JSON.parse(localStorage.getItem("sport-science-token"));
-      if (!token) return;
+      const tokens = JSON.parse(localStorage.getItem("sport-science-token"));
+      if (!tokens) return;
 
       const userFormData = new FormData();
       userFormData.append("name", newUser.name);
@@ -38,13 +42,15 @@ const AdminDashboard = () => {
       userFormData.append("role", newUser.role);
       userFormData.append("image", newUser.profileImage);
 
+      // ${API_BASE_URL_USER}
       const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
         method: "POST",
         headers: {
-          // "Content-Type": "application/json",
-          Authorization: `Bearer ${token.token}`,
+          // "Accept": "application/json",
+          Authorization: `Bearer ${tokens.token}`,
         },
         body: userFormData,
+        // credentials: 'include', // This is crucial!
       });
 
       if (response.ok) {
@@ -113,6 +119,15 @@ const AdminDashboard = () => {
     }
   };
 
+  // Filter users based on search input
+  const filteredUsers = summary?.user_record?.filter(
+    (user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()) // Adjust field as needed
+  );
+  // Filter users based on search input
+  const filteredSports = summary?.sports_record?.filter(
+    (sport) => sport.name.toLowerCase().includes(searchTermSp.toLowerCase()) // Adjust field as needed
+  );
+
   const user_column_table = [
     { label: "ID", key: "id" },
     { label: "Name", key: "name" },
@@ -168,7 +183,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex overflow-hidden">
       <MobileSidebar setActiveTab={setActiveTab} />{" "}
       {/* Pass function to Sidebar */}
       {/* Main Content */}
@@ -199,22 +214,42 @@ const AdminDashboard = () => {
         )}
 
         {activeTab === "sports" && (
-          <div className="text-2xl font-semibold text-gray-700">
+          <div className="w-full">
             {/* <h2></h2> */}
             {/* Add Sports Management Content */}
-            <div className="p-2 border">
+            <div className="p-2 border overflow-hidden w-full">
               <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-semibold text-gray-700 mb-4">
                   Sports Management
                 </h1>
-                <a
-                  onClick={handleOpenModal}
-                  className="text-sm rounded-sm p-1 bg-primary text-white hover:bg-green-600"
-                  href="#"
-                >
-                  Create Sports
-                </a>
+                <div className="flex gap-2 items-center">
+                  {/* Search Input */}
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTermSp}
+                    onChange={(e) => setSearchTermSp(e.target.value)}
+                    className="w-full px-3 py-1 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  <a
+                    onClick={handleOpenModal}
+                    className="text-sm text-center rounded-sm p-1 bg-primary text-white hover:bg-green-600"
+                    href="#"
+                  >
+                    Create
+                  </a>
+                </div>
+                
+
               </div>
+              {/* Sport Card */}
+              <div className="grid grid-cols-1 sphone:grid-cols-2 laptop:grid-cols-3 gap-2 p-2">
+                {filteredSports?.map((sport) => (
+                  <SportCard key={sport.id} sport={sport} />
+                ))}
+              </div>
+              {/* <div className="w-full overflow-x-auto">
               <ResponsiveTable
                 columns={sport_column_table}
                 data={summary.sports_record}
@@ -236,6 +271,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
               />
+              </div> */}
             </div>
           </div>
         )}
@@ -247,15 +283,32 @@ const AdminDashboard = () => {
                 <h1 className="text-2xl font-semibold text-gray-700 mb-4">
                   User Account Management
                 </h1>
-                <a
-                  onClick={handleOpenModalAccount}
-                  className="text-sm rounded-sm p-1 bg-primary text-white hover:bg-green-600"
-                  href="#"
-                >
-                  Create Account
-                </a>
+                <div className="flex gap-2 items-center">
+                  {/* Search Input */}
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-3 py-1 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  <a
+                    onClick={handleOpenModalAccount}
+                    className="text-sm text-center rounded-sm p-1 bg-primary text-white hover:bg-green-600"
+                    href="#"
+                  >
+                    Create
+                  </a>
+                </div>
               </div>
-              <ResponsiveTable
+
+              <div className="grid grid-cols-1 sphone:grid-cols-2 laptop:grid-cols-3 gap-2 p-2">
+                {filteredUsers?.map((user) => (
+                  <UserCard key={user.id} user={user} />
+                ))}
+              </div>
+              {/* <ResponsiveTable
                 columns={user_column_table}
                 data={summary.sports_record}
                 rowsPerPage={5}
@@ -275,7 +328,7 @@ const AdminDashboard = () => {
                     </button>
                   </div>
                 )}
-              />
+              /> */}
             </div>
           </div>
         )}

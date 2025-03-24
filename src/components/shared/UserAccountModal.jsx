@@ -74,6 +74,7 @@ export default function UserAccountModal({ isOpen, onClose, onSubmit }) {
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
+              <option value="" disabled>Select a Role</option>
               <option value="coach">Coach</option>
               <option value="athlete">Athlete</option>
             </select>
