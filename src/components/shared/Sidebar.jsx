@@ -53,9 +53,14 @@ export default function MobileSidebar({setActiveTab}) {
                         <button onClick={() => setIsOpen(true)} className="bg-gray-200 text-primary p-1 rounded tablet:hidden">☰</button>
                     )}
                 </div>
-                <div className="w-10 h-10 bg-gray-200 rounded-full">
-                    <img src="/assets/profile/default-profile.png" alt="" />    
-                </div> {/* Profile Placeholder */}
+                <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden">
+                    <img 
+                        src={user?.user?.profile ? `${API_BASE_URL}/storage/${user.user.profile}` : "/assets/profile/default-profile.png"} 
+                        alt="Profile"
+                        className="w-full h-full object-cover" 
+                    />    
+                </div>
+
             </header>
 
             {/* Sidebar */}
@@ -69,7 +74,10 @@ export default function MobileSidebar({setActiveTab}) {
                         <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
                         <a onClick={() => setActiveTab("sports")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Sports</a>
                         <a onClick={() => setActiveTab("accounts")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Accounts</a>
-                        {/* <a onClick={() => setActiveTab("athletes")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
+                        <div className="w-full py-2  border-t-2">
+                            <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
+                            <a onClick={() => setActiveTab("profile")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
+                        </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
                 )}
@@ -77,6 +85,10 @@ export default function MobileSidebar({setActiveTab}) {
                     <nav className="p-4">
                         <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
                         <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">My Activity</a>
+                        <div className="w-full py-2  border-t-2">
+                            <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
+                            <a onClick={() => setActiveTab("profile")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
+                        </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
                 )}
@@ -85,6 +97,10 @@ export default function MobileSidebar({setActiveTab}) {
                     <nav className="p-4">
                         <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
                         <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a>
+                        <div className="w-full py-2  border-t-2">
+                            <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
+                            <a onClick={() => setActiveTab("profile")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
+                        </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
                 )}

@@ -7,6 +7,7 @@ import CreateSportModal from "../shared/CreateSportModal";
 import Swal from "sweetalert2";
 import UserAccountModal from "../shared/UserAccountModal";
 import UserCard from "../shared/UserCard";
+import ProfileManagement from "../shared/ProfileManagement";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
@@ -14,6 +15,7 @@ const API_BASE_URL =
 //get the total created Sports
 
 const AdminDashboard = () => {
+  const user = JSON.parse(localStorage.getItem("sport-science-token"));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenAccount, setIsModalOpenAccount] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard"); // Default view is Dashboard
@@ -331,6 +333,10 @@ const AdminDashboard = () => {
               /> */}
             </div>
           </div>
+        )}
+
+        {activeTab === "profile" && (
+          <ProfileManagement user={user}/>
         )}
       </div>
       {/* Modal Component */}
