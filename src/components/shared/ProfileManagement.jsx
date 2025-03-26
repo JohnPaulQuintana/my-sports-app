@@ -123,7 +123,7 @@ const ProfileManagement = ({ user }) => {
             <img
               src={formData.avatar != "null" ? `${API_BASE_URL}/storage/${formData.avatar}` : "https://www.pngkey.com/png/full/115-1150152_default-profile-picture-avatar-png-green.png"}
               alt="Avatar"
-              className="w-[70%] h-full tablet:w-20 tablet:h-20  rounded-md border"
+              className="w-[70%] h-full tablet:w-28 tablet:h-20  rounded-md border"
             />
             <input
               type="file"
