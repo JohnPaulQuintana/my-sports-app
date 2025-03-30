@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 
+import { useParams } from "react-router-dom";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
 
 export default function MobileSidebarSub({setActiveTab}) {
+    const { id } = useParams(); // Extract the dynamic id from the URL
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState({});
 
@@ -97,14 +100,18 @@ export default function MobileSidebarSub({setActiveTab}) {
 
                 {getUserRole() === 'coach' && (
                     <nav className="p-4">
-                        <Link to="/coach" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</Link>
-                        <Link to="/coach" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Back to Home</Link>
+                        <Link to="/coach" className="block py-2 px-4 text-secondary hover:bg-gray-200 rounded">Back to Home</Link>
+                        <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
                         {/* <a  onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
+                        <div className="w-full py-2  border-t-2">
+                            <span className="px-4 text-gray-400 text-sm">Category</span>
+                            <a onClick={() => setActiveTab("category")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Performance</a>
+                        </div>
                         <div className="w-full py-2  border-t-2">
                             <span className="px-4 text-gray-400 text-sm">Communication</span>
                             <a onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
                         </div>
-                        <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
+                        <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-secondary">Logout</a>
                     </nav>
                 )}
                 

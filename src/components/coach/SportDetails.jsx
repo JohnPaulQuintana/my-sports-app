@@ -5,6 +5,9 @@ import AthletePerformanceChart from "../shared/AthletePerformanceChart";
 import User from "../shared/User";
 import GroupMessages from "../shared/GroupMessages";
 import Swal from "sweetalert2";
+import Category from "../shared/Category";
+import UserCardPerformance from "../shared/UserCardTable";
+import UserCardTable from "../shared/UserCardTable";
 
 const user = JSON.parse(localStorage.getItem("sport-science-token"));
 const API_BASE_URL =
@@ -17,16 +20,68 @@ const SportDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // add performance category
+  const handleAddPerformanceCategory = (sport_id) => {
+    Swal.fire({
+      title: "Add performance category",
+      html: `
+        <input type="text" value="" id="sport-category" class="swal2 w-full border p-2"  required/>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Add Category",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        const inputName = document.getElementById("sport-category").value;
+        if (!inputName) {
+          return Swal.showValidationMessage("Please select an athlete.");
+        }
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/performance/category/create`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`,
+              },
+              body: JSON.stringify({
+                sport_id: sport_id,
+                name: inputName,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            return Swal.showValidationMessage(
+              `Error: ${JSON.stringify(await response.json())}`
+            );
+          }
+
+          return response.json();
+        } catch (error) {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        }
+      },
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Successfully added!`,
+          // imageUrl: result.value.avatar_url
+        });
+      }
+    });
+  };
   // add athletes
   const handleAddAthelete = (sport_id) => {
-    console.log(sport.athletes)
+    console.log(sport.athletes);
     // Generate the options dynamically
     const options = sport?.athletes
-    .map(
-      (athlete) =>
-        `<option value="${athlete.id}">${athlete.name}</option>`
-    )
-    .join("");
+      .map(
+        (athlete) => `<option value="${athlete.id}">${athlete.name}</option>`
+      )
+      .join("");
     Swal.fire({
       title: "Add new Athlete",
       html: `
@@ -36,37 +91,42 @@ const SportDetails = () => {
         </select>
       `,
       showCancelButton: true,
-      confirmButtonText: "Look up",
+      confirmButtonText: "Add Athlete",
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         const selectedAthlete = document.getElementById("athlete-select").value;
         if (!selectedAthlete) {
           return Swal.showValidationMessage("Please select an athlete.");
         }
-        
+
         try {
-          const response = await fetch(`${API_BASE_URL}/api/athlete/assign-sport`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user?.token}`,
-            },
-            body: JSON.stringify({
-              athlete_id: selectedAthlete,
-              sport_id: sport_id,
-            }),
-          });
-    
+          const response = await fetch(
+            `${API_BASE_URL}/api/athlete/assign-sport`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`,
+              },
+              body: JSON.stringify({
+                athlete_id: selectedAthlete,
+                sport_id: sport_id,
+              }),
+            }
+          );
+
           if (!response.ok) {
-            return Swal.showValidationMessage(`Error: ${JSON.stringify(await response.json())}`);
+            return Swal.showValidationMessage(
+              `Error: ${JSON.stringify(await response.json())}`
+            );
           }
-    
+
           return response.json();
         } catch (error) {
           Swal.showValidationMessage(`Request failed: ${error}`);
         }
       },
-      allowOutsideClick: false
+      allowOutsideClick: false,
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
@@ -75,8 +135,8 @@ const SportDetails = () => {
         });
       }
     });
-    
-  }
+  };
+
   useEffect(() => {
     const fetchSport = async () => {
       try {
@@ -115,15 +175,24 @@ const SportDetails = () => {
       <MobileSidebarSub setActiveTab={setActiveTab} /> {/* Main Content */}
       {activeTab === "dashboard" && (
         <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
-          <div className="py-4 text-base tablet:text-2xl font-semibold text-gray-700 flex justify-between">
+          <div className="py-4 text-base tablet:text-2xl font-semibold text-gray-700 flex flex-col tablet:flex-row justify-between">
             <span>Welcome to the sport details!</span>
-            <button
-            onClick={()=>handleAddAthelete(id)}
-              type="button"
-              className="text-xs tablet:text-sm bg-primary px-1 text-white"
-            >
-              + Athletes
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleAddPerformanceCategory(id)}
+                type="button"
+                className="text-xs tablet:text-sm bg-primary px-1 text-white"
+              >
+                + Category
+              </button>
+              <button
+                onClick={() => handleAddAthelete(id)}
+                type="button"
+                className="text-xs tablet:text-sm bg-primary px-1 text-white"
+              >
+                + Athletes
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-1 tablet:grid-cols-3 gap-2">
             <div className="shadow flex flex-col gap-2">
@@ -139,7 +208,9 @@ const SportDetails = () => {
               {/* <p>Description: <span>{sport?.sport.descriptions}</span></p> */}
               <div className="grid grid-cols-3 p-2 gap-2">
                 <div className="border border-primary p-2 flex items-center flex-col">
-                  <h1 className="font-extrabold text-xl text-secondary">{sport?.sport?.athletes.length}</h1>
+                  <h1 className="font-extrabold text-xl text-secondary">
+                    {sport?.sport?.athletes.length}
+                  </h1>
                   <span>Atheletes</span>
                 </div>
                 <div className="border border-primary p-2 flex items-center flex-col">
@@ -159,7 +230,26 @@ const SportDetails = () => {
           </div>
         </div>
       )}
+      {/* Category */}
+      {activeTab === "category" && (
+        <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
+          <div className="py-4 text-2xl font-semibold text-gray-700 flex justify-between">
+            <span>Welcome to the sport performance!</span>
+          </div>
 
+          <div className="mb-4">
+              <Category sport_id={id}/>
+          </div>
+
+          <div className="border shadow p-2">
+            {/* <User group_id={sport?.sport?.group?.id} /> */}
+            <h1>Performance Result Today</h1>
+            <p className="text-gray-500">Click the card to add performance for each atheletes</p>
+            <p className="text-red-500">NOTE: Adding performance is not completed, table is already done</p>
+            <UserCardTable group_id={sport?.sport?.group?.id}/>
+          </div>
+        </div>
+      )}
       {/* group chats section */}
       {activeTab === "groupchat" && (
         <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
@@ -171,13 +261,13 @@ const SportDetails = () => {
             {/* users card */}
             <div className="shadow order-2 flex flex-col gap-2 p-2">
               <h1 className="text-gray-600">Members - 20</h1>
-              <User group_id={sport?.sport?.group?.id}/>
+              <User group_id={sport?.sport?.group?.id} />
             </div>
             {/* message */}
             <div className="shadow col-span-3 p-2">
               {/* <h1 className="text-gray-600">Group Messages</h1> */}
               <div className="">
-                <GroupMessages group_id={sport?.sport?.group?.id}/>
+                <GroupMessages group_id={sport?.sport?.group?.id} />
               </div>
             </div>
           </div>
