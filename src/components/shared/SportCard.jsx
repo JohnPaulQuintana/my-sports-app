@@ -2,7 +2,7 @@ import React from "react";
 const API_BASE_URL =
   import.meta.env.VITE_FRONTEND_Image_URL || "http://127.0.0.1:8001";
   
-const SportCard = ({ sport }) => {
+const SportCard = ({ sport, handleOpenModalEdit }) => {
   return (
     <div className="bg-white border shadow-lg rounded-lg p-4 mt-4">
       <div className="flex justify-between items-center">
@@ -29,6 +29,9 @@ const SportCard = ({ sport }) => {
         </div>
       )}
       <p className="text-gray-600">{sport.descriptions}</p>
+      <div className="bg-gray-100 p-2 flex gap-2 items-center">
+        <button type="button" className="bg-green-200 font-semibold p-1 w-[60px]" onClick={()=>handleOpenModalEdit(sport)}>Edit</button>
+      </div>
     </div>
   );
 };

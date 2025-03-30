@@ -62,7 +62,7 @@ function App() {
         <Route path="/dashboard" element={<RedirectToDashboard />} />
         
         <Route
-          path="/admin"
+          path="/admin/*"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminPage />
@@ -70,7 +70,7 @@ function App() {
           }
         />
         <Route
-          path="/coach"
+          path="/coach/*"
           element={
             <ProtectedRoute allowedRoles={["coach"]}>
               <CoachPage />
@@ -78,7 +78,7 @@ function App() {
           }
         />
         <Route
-          path="/athlete"
+          path="/athlete/*"
           element={
             <ProtectedRoute allowedRoles={["athlete"]}>
               <AthletePage />

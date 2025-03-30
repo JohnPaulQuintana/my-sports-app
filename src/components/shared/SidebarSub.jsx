@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { Routes, Route, Link } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
 
-export default function MobileSidebar({setActiveTab}) {
+export default function MobileSidebarSub({setActiveTab}) {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState({});
 
@@ -45,7 +46,7 @@ export default function MobileSidebar({setActiveTab}) {
     return (
         <div className="relative">
             {/* Header */}
-            <header className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-[9999999]">
+            <header className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-50">
                 <div className="flex items-center gap-4 text-xl font-bold xsphone:ps-0">
                     <span className="text-primary">Sport Science</span>
                      {/* Toggle Button - Only on Mobile */}
@@ -64,30 +65,31 @@ export default function MobileSidebar({setActiveTab}) {
             </header>
 
             {/* Sidebar */}
-            <div className={`fixed z-[9999] top-16 left-0 w-64 h-full bg-white shadow-lg transform tablet:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out tablet:block`}>
+            <div className={`fixed top-16 left-0 w-64 h-full bg-white shadow-lg transform tablet:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out tablet:block`}>
                 <div className="p-4 border-b flex justify-between items-center tablet:hidden">
                     <h2 className="text-lg font-semibold">Menu</h2>
                     <button onClick={() => setIsOpen(false)} className="text-gray-600">&times;</button>
                 </div>
                 {getUserRole() === 'admin' && (
                     <nav className="p-4">
-                        <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
-                        <a onClick={() => setActiveTab("sports")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Sports</a>
-                        <a onClick={() => setActiveTab("accounts")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Accounts</a>
+                        <Link to="/admin" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</Link>
+                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Sports</a>
+                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Accounts</a>
                         <div className="w-full py-2  border-t-2">
                             <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
-                            <a onClick={() => setActiveTab("profile")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
+                            <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
                         </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
                 )}
                 {getUserRole() === 'athlete' && (
                     <nav className="p-4">
-                        <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
-                        <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">My Activity</a>
+                        <Link to="/athlete" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</Link>
+                        <Link to="/athlete" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Back to Home</Link>
+                        {/* <a  onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
                         <div className="w-full py-2  border-t-2">
-                            <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
-                            <a onClick={() => setActiveTab("profile")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
+                            <span className="px-4 text-gray-400 text-sm">Communication</span>
+                            <a onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
                         </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
@@ -95,11 +97,12 @@ export default function MobileSidebar({setActiveTab}) {
 
                 {getUserRole() === 'coach' && (
                     <nav className="p-4">
-                        <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
-                        <a onClick={() => setActiveTab("athletes")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a>
+                        <Link to="/coach" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</Link>
+                        <Link to="/coach" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Back to Home</Link>
+                        {/* <a  onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
                         <div className="w-full py-2  border-t-2">
-                            <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
-                            <a onClick={() => setActiveTab("profile")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Profile</a>
+                            <span className="px-4 text-gray-400 text-sm">Communication</span>
+                            <a onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
                         </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>

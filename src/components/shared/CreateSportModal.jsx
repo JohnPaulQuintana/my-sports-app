@@ -1,10 +1,12 @@
 import { useState } from "react";
 
-export default function CreateSportModal({ isOpen, onClose, onSubmit }) {
+export default function CreateSportModal({ isOpen, onClose, onSubmit, availableCoach }) {
+  // console.log(availableCoach)
   const [formData, setFormData] = useState({
     name: "",
     descriptions: "",
     image: null,
+    coach: "", // Add coach field
   });
 
   const handleChange = (e) => {
@@ -26,7 +28,7 @@ export default function CreateSportModal({ isOpen, onClose, onSubmit }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999999]">
       <div className="bg-white rounded-lg p-6 w-96">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Create Sport</h2>
 
@@ -68,6 +70,28 @@ export default function CreateSportModal({ isOpen, onClose, onSubmit }) {
               required
             />
           </div>
+
+          {/* Assign Coach */}
+          <div>
+            <label htmlFor="coachSelect" className="block text-sm font-medium text-gray-700">
+              Assign Coach
+            </label>
+            <select
+              id="coachSelect"
+              name="coach"
+              value={formData.coach} // Controlled input
+              onChange={handleChange} // Handle selection change
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Select a Coach</option>
+              {availableCoach.map((coach) => (
+                <option key={coach.id} value={coach.id}>
+                  {coach.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
 
           {/* Buttons */}
           <div className="flex justify-end space-x-2">
