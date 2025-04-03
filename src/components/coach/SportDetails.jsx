@@ -129,6 +129,7 @@ const SportDetails = () => {
       allowOutsideClick: false,
     }).then((result) => {
       if (result.isConfirmed) {
+        fetchSport()
         Swal.fire({
           title: `Successfully added!`,
           // imageUrl: result.value.avatar_url
@@ -137,36 +138,36 @@ const SportDetails = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchSport = async () => {
-      try {
-        const token = JSON.parse(localStorage.getItem("sport-science-token"));
-        console.log("Token:", token); // Debugging
-        if (!token || !token.token) return; // Ensure token is valid
+  const fetchSport = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem("sport-science-token"));
+      // console.log("Token:", token); // Debugging
+      if (!token || !token.token) return; // Ensure token is valid
 
-        const response = await fetch(`${API_BASE_URL}/api/coach/sport/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token.token}`,
-          },
-        });
+      const response = await fetch(`${API_BASE_URL}/api/coach/sport/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.token}`,
+        },
+      });
 
-        const data = await response.json();
-        console.log("API Response:", data); // Debugging
+      const data = await response.json();
+      console.log("API Response:", data); // Debugging
 
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch total sports");
-        }
-
-        setSport(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch total sports");
       }
-    };
 
+      setSport(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchSport();
   }, []);
 
@@ -209,7 +210,7 @@ const SportDetails = () => {
               <div className="grid grid-cols-3 p-2 gap-2">
                 <div className="border border-primary p-2 flex items-center flex-col">
                   <h1 className="font-extrabold text-xl text-secondary">
-                    {sport?.sport?.athletes.length}
+                    {sport?.sport?.athletes.length > 0 ? sport?.sport?.athletes.length - 1 : 0}
                   </h1>
                   <span>Atheletes</span>
                 </div>
@@ -225,11 +226,12 @@ const SportDetails = () => {
             </div>
             <div className="shadow col-span-2 p-2">
               <h1>Athlete Performance Chart</h1>
-              <AthletePerformanceChart />
+              <AthletePerformanceChart sport_id={id}/>
             </div>
           </div>
         </div>
       )}
+
       {/* Category */}
       {activeTab === "category" && (
         <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
@@ -238,15 +240,17 @@ const SportDetails = () => {
           </div>
 
           <div className="mb-4">
-              <Category sport_id={id}/>
+            <Category sport_id={id} />
           </div>
 
           <div className="border shadow p-2">
             {/* <User group_id={sport?.sport?.group?.id} /> */}
-            <h1>Performance Result Today</h1>
-            <p className="text-gray-500">Click the card to add performance for each atheletes</p>
-            <p className="text-red-500">NOTE: Adding performance is not completed, table is already done</p>
-            <UserCardTable group_id={sport?.sport?.group?.id}/>
+            <h1 className="font-bold">Performance Result Today</h1>
+            <p className="text-gray-500">
+              Click the card to add performance for each atheletes
+            </p>
+            {/* <p className="text-red-500">NOTE: Adding performance is not completed, table is already done</p> */}
+            <UserCardTable group_id={sport?.sport?.group?.id} />
           </div>
         </div>
       )}

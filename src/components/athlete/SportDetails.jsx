@@ -118,13 +118,13 @@ const SportDetails = () => {
         <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
           <div className="py-4 text-base tablet:text-2xl font-semibold text-gray-700 flex justify-between">
             <span>Welcome to the sport details!</span>
-            <button
+            {/* <button
             onClick={()=>handleAddAthelete(id)}
               type="button"
               className="text-xs tablet:text-sm bg-primary px-1 text-white"
             >
               + Athletes
-            </button>
+            </button> */}
           </div>
           <div className="grid grid-cols-1 tablet:grid-cols-3 gap-4">
             <div className="shadow flex flex-col gap-2">
@@ -155,7 +155,7 @@ const SportDetails = () => {
             </div>
             <div className="shadow col-span-2 p-4">
               <h1>Athlete Performance Chart</h1>
-              <PerformanceChart />
+              <PerformanceChart sport_id={id}/>
             </div>
           </div>
         </div>
