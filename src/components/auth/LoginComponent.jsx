@@ -45,7 +45,7 @@ const LoginComponent = () => {
 
   const handlePasswordReset = async () => {
     try {
-      const reset_link = `${VITE_FRONTEND_BASE_URL}/reset-password`
+      const reset_link = `${VITE_FRONTEND_BASE_URL}reset-password`
       const response = await fetch(
         `${API_BASE_URL}/api/forgot-password`,
         {
