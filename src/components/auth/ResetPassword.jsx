@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { useSearchParams } from "react-router-dom";
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { showAlert } from "../swal/showAlert";
+import { showLoader } from "../swal/showLoader";
 // import axios from "axios";
 
 let API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL_FORGOT || "http://127.0.0.1:8001";
-  
+
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const [token, setToken] = useState("");
@@ -15,6 +17,10 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
 
   useEffect(() => {
     const tokenFromUrl = searchParams.get("token");
@@ -27,9 +33,10 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    showLoader("Processing...", "Please wait while we reset your password");
     if (password !== confirmPassword) {
       setMessage("Passwords do not match!");
+      Swal.close();
       return;
     }
 
@@ -38,7 +45,7 @@ const ResetPassword = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json", // Force JSON response
+          Accept: "application/json", // Force JSON response
         },
         body: JSON.stringify({
           token,
@@ -50,10 +57,16 @@ const ResetPassword = () => {
       if (!response.ok) {
         throw new Error(data.message || "Something went wrong");
       }
+      Swal.close();
       console.log("Password reset successful:", data);
-      showAlert('Password reset successful','Proceed to login now!','success')
-      window.location.href = "/"
+      showAlert(
+        "Password reset successful",
+        "Proceed to login now!",
+        "success"
+      );
+      window.location.href = "/";
     } catch (error) {
+      Swal.close();
       setMessage(error.response?.data?.detail || "Failed to reset password.");
     }
   };
@@ -100,36 +113,82 @@ const ResetPassword = () => {
             <p className="text-center text-red-500 mt-2">{message}</p>
           )}
           <form onSubmit={handleSubmit}>
-            <div className="mb-5">
+            <div className="mb-5 relative">
               <label htmlFor="password" className="text-white">
                 New Password
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
-                className="w-full p-2 rounded bg-transparent border text-primary"
+                className="w-full p-2 rounded bg-transparent border text-white"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPassword(value);
+                  const isValid = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(value);
+                  if (!isValid) {
+                    setPasswordError(
+                      "Password must be at least 8 characters with upper and lowercase letters."
+                    );
+                  } else {
+                    setPasswordError("");
+                  }
+
+                  // Also check confirm match if it's already filled
+                  if (confirmPassword && value !== confirmPassword) {
+                    setConfirmError("Passwords do not match.");
+                  } else {
+                    setConfirmError("");
+                  }
+                }}
                 required
               />
+              {passwordError && (
+                <p className="text-red-400 text-sm mt-1">{passwordError}</p>
+              )}
+              <button
+                type="button"
+                className="absolute right-3 top-[38px] text-sm text-white"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
-            <div className="mb-5">
+            <div className="mb-5 relative">
               <label htmlFor="password" className="text-white">
                 Confirm Password
               </label>
               <input
-                type="password"
+                type={showPasswordConfirm ? "text" : "password"}
                 id="confirm-password"
-                className="w-full p-2 rounded bg-transparent border text-primary"
+                className="w-full p-2 rounded bg-transparent border text-white"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setConfirmPassword(value)
+                  // Also check confirm match if it's already filled
+                  if (value !== password) {
+                    setConfirmError('Passwords do not match.');
+                  } else {
+                    setConfirmError('');
+                  }
+                }}
                 required
               />
+              {confirmError && (
+                <p className="text-red-400 text-sm mt-1">{confirmError}</p>
+              )}
+              <button
+                type="button"
+                className="absolute right-3 top-[38px] text-sm text-white"
+                onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+              >
+                {showPasswordConfirm ? "Hide" : "Show"}
+              </button>
             </div>
             {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
             <div className="bg-transparent border mb-5">
-                
               <a
                 href="/login"
                 className="w-full flex items-center justify-center gap-1 rounded-sm font-bold cursor-pointer p-2 text-white hover:bg-white hover:text-primary"
@@ -139,7 +198,6 @@ const ResetPassword = () => {
               </a>
             </div>
             <div className="bg-primary mb-5">
-                
               <button
                 type="submit"
                 className="w-full flex items-center justify-center gap-1 rounded-sm font-bold cursor-pointer p-2 text-white hover:bg-white hover:text-primary"

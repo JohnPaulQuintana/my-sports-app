@@ -25,15 +25,66 @@ const SportDetails = () => {
     Swal.fire({
       title: "Add performance category",
       html: `
-        <input type="text" value="" id="sport-category" class="swal2 w-full border p-2"  required/>
+        <div class="mb-4">
+          <label for="category-select" class="mb-2 block">
+            Select or Add a Sport Category
+          </label>
+          <select id="category-select" class="w-full border p-2 rounded bg-transparent focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="" disabled selected>Select an existing category</option>
+            ${sport?.categories
+              .map(
+                (category) =>
+                  `<option value="${category.category}">${category.category}</option>`
+              )
+              .join("")}
+            <option value="new">Add New Category</option>
+          </select>
+        </div>
+    
+        <div class="mb-4" id="new-category-div" style="display: none;">
+          <label for="sport-category" class="mb-2 block">
+            New Sport Category
+          </label>
+          <input
+            type="text"
+            value=""
+            id="sport-category"
+            class="w-full border p-2 rounded bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            required
+          />
+        </div>
+    
+        <div class="mb-4">
+          <label for="description" class="mb-2 block">
+            Description
+          </label>
+          <textarea
+            id="description"
+            class="w-full border p-2 rounded bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            rows="4"
+          ></textarea>
+        </div>
       `,
       showCancelButton: true,
       confirmButtonText: "Add Category",
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        const inputName = document.getElementById("sport-category").value;
+        const categorySelect = document.getElementById("category-select").value;
+        const inputName =
+          categorySelect === "new"
+            ? document.getElementById("sport-category").value
+            : categorySelect;
+        const inputDescription = document.getElementById("description").value;
+
+        // Validation
         if (!inputName) {
-          return Swal.showValidationMessage("Please select an athlete.");
+          return Swal.showValidationMessage(
+            "Please select or enter a category."
+          );
+        }
+
+        if (!inputDescription) {
+          return Swal.showValidationMessage("Please enter a description.");
         }
 
         try {
@@ -48,14 +99,18 @@ const SportDetails = () => {
               body: JSON.stringify({
                 sport_id: sport_id,
                 name: inputName,
+                description: inputDescription,
               }),
             }
           );
 
           if (!response.ok) {
-            return Swal.showValidationMessage(
-              `Error: ${JSON.stringify(await response.json())}`
-            );
+            const errorData = await response.json();
+            const errorMessages = Object.values(errorData.errors)
+              .flat()
+              .join(", "); // Combine all error messages
+
+            return Swal.showValidationMessage(`Error: ${errorMessages}`);
           }
 
           return response.json();
@@ -67,11 +122,23 @@ const SportDetails = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
-          title: `Successfully added!`,
-          // imageUrl: result.value.avatar_url
+          title: "Successfully added!",
+          text: "The performance category has been added.",
         });
       }
     });
+
+    // Event listener to toggle the new category input visibility
+    document
+      .getElementById("category-select")
+      .addEventListener("change", (e) => {
+        const newCategoryDiv = document.getElementById("new-category-div");
+        if (e.target.value === "new") {
+          newCategoryDiv.style.display = "block";
+        } else {
+          newCategoryDiv.style.display = "none";
+        }
+      });
   };
   // add athletes
   const handleAddAthelete = (sport_id) => {
@@ -129,7 +196,7 @@ const SportDetails = () => {
       allowOutsideClick: false,
     }).then((result) => {
       if (result.isConfirmed) {
-        fetchSport()
+        fetchSport();
         Swal.fire({
           title: `Successfully added!`,
           // imageUrl: result.value.avatar_url
@@ -210,7 +277,9 @@ const SportDetails = () => {
               <div className="grid grid-cols-3 p-2 gap-2">
                 <div className="border border-primary p-2 flex items-center flex-col">
                   <h1 className="font-extrabold text-xl text-secondary">
-                    {sport?.sport?.athletes.length > 0 ? sport?.sport?.athletes.length - 1 : 0}
+                    {sport?.sport?.athletes.length > 0
+                      ? sport?.sport?.athletes.length - 1
+                      : 0}
                   </h1>
                   <span>Atheletes</span>
                 </div>
@@ -226,17 +295,23 @@ const SportDetails = () => {
             </div>
             <div className="shadow col-span-2 p-2">
               <h1>Athlete Performance Chart</h1>
-              <AthletePerformanceChart sport_id={id}/>
+              <AthletePerformanceChart sport_id={id} />
             </div>
           </div>
         </div>
       )}
-
+      {activeTab === "athletes" && (
+        <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
+          <div className="py-4 text-2xl font-semibold text-gray-700 flex justify-between">
+            <span>Welcome to the athletes performance!</span>
+          </div>
+        </div>
+      )}
       {/* Category */}
       {activeTab === "category" && (
         <div className="flex-1 ml-0 tablet:ml-[260px] p-4 mt-16">
           <div className="py-4 text-2xl font-semibold text-gray-700 flex justify-between">
-            <span>Welcome to the sport performance!</span>
+            <span>Welcome to the category dashboard!</span>
           </div>
 
           <div className="mb-4">

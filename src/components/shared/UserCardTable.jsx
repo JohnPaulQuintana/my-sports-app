@@ -48,14 +48,28 @@ const UserCardTable = ({ group_id }) => {
   const handleCategoryClick = async (athlete_id, category_id, category_name) => {
     Swal.fire({
       title: `${category_name} Score`,
-      html: `<input type="number" id="sport-category-value" class="swal2-input" required/>`,
+      html: `
+        <div class="mb-4">
+          <label for="sport-category-value" class="text-white mb-2 block">Score (1-5)</label>
+          <input 
+            type="range" 
+            id="sport-category-value" 
+            class="swal2-input" 
+            min="1" 
+            max="5" 
+            step="1" 
+            required
+          />
+          <span id="slider-value">3</span> <!-- Default value of 3 -->
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonText: "Add Score",
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         const inputScore = document.getElementById("sport-category-value").value;
         if (!inputScore) return Swal.showValidationMessage("Please enter a score.");
-
+  
         try {
           const response = await fetch(`${API_BASE_URL}/api/performance/category/insert`, {
             method: "POST",
@@ -69,11 +83,11 @@ const UserCardTable = ({ group_id }) => {
               category_score: inputScore,
             }),
           });
-
+  
           if (!response.ok) {
             return Swal.showValidationMessage(`Error: ${JSON.stringify(await response.json())}`);
           }
-
+  
           return response.json();
         } catch (error) {
           Swal.showValidationMessage(`Request failed: ${error}`);
@@ -86,20 +100,44 @@ const UserCardTable = ({ group_id }) => {
         fetchGroupUsers(); // 🔄 Refresh data after success
       }
     });
+  
+    // Add an event listener to update the displayed value when the slider is moved
+    const slider = document.getElementById("sport-category-value");
+    const sliderValue = document.getElementById("slider-value");
+  
+    slider.addEventListener("input", () => {
+      sliderValue.textContent = slider.value;
+    });
   };
+  
 
   // Handle editing a score
   const handleCategoryClickEdit = async (performance_id, result, category_name) => {
     Swal.fire({
       title: `${category_name} Score Edit`,
-      html: `<input type="number" value="${result}" id="sport-category-value-edit" class="swal2-input" required/>`,
+      html: `
+        <div class="mb-4">
+          <label for="sport-category-value-edit" class="text-white mb-2 block">Score (1-5)</label>
+          <input 
+            type="range" 
+            value="${result}" 
+            id="sport-category-value-edit" 
+            class="swal2-input" 
+            min="1" 
+            max="5" 
+            step="1" 
+            required
+          />
+          <span id="slider-value">${result}</span>
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonText: "Edit Score",
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         const inputScore = document.getElementById("sport-category-value-edit").value;
         if (!inputScore) return Swal.showValidationMessage("Please enter a score.");
-
+  
         try {
           const response = await fetch(`${API_BASE_URL}/api/performance/category/edit`, {
             method: "POST",
@@ -112,11 +150,11 @@ const UserCardTable = ({ group_id }) => {
               result: inputScore,
             }),
           });
-
+  
           if (!response.ok) {
             return Swal.showValidationMessage(`Error: ${JSON.stringify(await response.json())}`);
           }
-
+  
           return response.json();
         } catch (error) {
           Swal.showValidationMessage(`Request failed: ${error}`);
@@ -129,7 +167,16 @@ const UserCardTable = ({ group_id }) => {
         fetchGroupUsers(); // 🔄 Refresh data after success
       }
     });
+  
+    // Add an event listener to update the displayed value when the slider is moved
+    const slider = document.getElementById("sport-category-value-edit");
+    const sliderValue = document.getElementById("slider-value");
+  
+    slider.addEventListener("input", () => {
+      sliderValue.textContent = slider.value;
+    });
   };
+  
 
   return (
     <div className="flex flex-col">

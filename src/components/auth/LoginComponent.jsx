@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
+
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { showAlert } from "../swal/showAlert";
+import { showLoader } from "../swal/showLoader";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
@@ -13,12 +16,15 @@ const LoginComponent = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   //for forgot password
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
+    showLoader("Logging in...", "Please wait while we log you in.");
     try {
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
@@ -33,39 +39,48 @@ const LoginComponent = () => {
         // alert('not ok')
         throw new Error(data.message || "Login failed");
       }
-
+      Swal.close(); // Hide loader
       console.log("Login successful:", data);
       localStorage.setItem("sport-science-token", JSON.stringify(data));
       // Handle successful login (e.g., store token, redirect user)
       window.location.href = `/${data.user.role}`;
     } catch (err) {
+      Swal.close(); // Ensure loader closes before showing error
       setError(err.message);
     }
   };
 
   const handlePasswordReset = async () => {
+    showLoader('Processing...', 'Please wait while we send an email!');
     try {
-      const reset_link = `${VITE_FRONTEND_BASE_URL}reset-password`
-      const response = await fetch(
-        `${API_BASE_URL}/api/forgot-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email,reset_link }),
-        }
-      );
+      const reset_link = `${VITE_FRONTEND_BASE_URL}reset-password`;
+      const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, reset_link }),
+      });
 
       if (response.ok) {
+        Swal.close()
         // alert("Password reset link sent to your email");
-        showAlert("Password Reset", "A reset link has been sent to your email.", "success");
+        showAlert(
+          "Password Reset",
+          "A reset link has been sent to your email.",
+          "success"
+        );
         setIsForgotModalOpen(false);
-        setEmail('')
+        setEmail("");
       } else {
+        Swal.close();
         // alert("Failed to send password reset link");
-        showAlert("Password Reset Failed", "Failed to send reset link. Please try again.", "error");
-        setEmail('')
+        showAlert(
+          "Password Reset Failed",
+          "Failed to send reset link. Please try again.",
+          "error"
+        );
+        setEmail("");
       }
     } catch (error) {
       console.error("Password reset failed", error);
@@ -88,25 +103,34 @@ const LoginComponent = () => {
               <input
                 type="email"
                 id="email"
-                className="w-full p-2 rounded bg-transparent border text-primary"
+                className="w-full p-2 rounded bg-transparent border text-white"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
-            <div className="mb-5">
+            <div className="mb-5 relative">
               <label htmlFor="password" className="text-white">
                 Password
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
-                className="w-full p-2 rounded bg-transparent border text-primary"
+                className="w-full p-2 pr-10 rounded bg-transparent border text-white"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+
+              <button
+                type="button"
+                className="absolute right-3 top-[38px] text-sm text-white"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
+
             {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
             <div className="mb-5 text-end w-full">
               <a
@@ -146,7 +170,7 @@ const LoginComponent = () => {
             </p>
             <input
               type="email"
-              value={email} 
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 border rounded mb-4 bg-transparent text-primary"
               placeholder="Enter your email"
@@ -158,7 +182,10 @@ const LoginComponent = () => {
               >
                 Cancel
               </button>
-              <button onClick={handlePasswordReset} className="px-4 py-2 bg-primary text-white rounded">
+              <button
+                onClick={handlePasswordReset}
+                className="px-4 py-2 bg-primary text-white rounded"
+              >
                 Submit
               </button>
             </div>

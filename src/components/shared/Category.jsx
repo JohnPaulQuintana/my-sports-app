@@ -10,36 +10,51 @@ const Category = ({ sport_id }) => {
   const [error, setError] = useState(null);
 
   //   handle the category updates
-  const handleCategoryUpdate = (category_id, initialValue) => {
+  const handleCategoryUpdate = (category_id, initialValue, initialValueDesc) => {
     Swal.fire({
       title: "Edit performance category",
       html: `
-        <input type="text" value="${initialValue}" id="sport-category" class="swal2 w-full border p-2" required/>
+        <div class="mb-4">
+          <label for="sport-category" class="text-white mb-2 block">Category Name</label>
+          <input type="text" value="${initialValue}" id="sport-category" class="swal2 w-full border p-2" required/>
+        </div>
+        <div class="mb-4">
+          <label for="description" class="text-white mb-2 block">Description</label>
+          <textarea id="description" class="swal2 w-full border p-2" rows="4">${initialValueDesc}</textarea>
+        </div>
       `,
       showCancelButton: true,
       confirmButtonText: "Update Category",
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         const inputName = document.getElementById("sport-category").value;
+        const inputDescription = document.getElementById("description").value;
+  
         if (!inputName) {
           return Swal.showValidationMessage("Category name cannot be empty.");
         }
   
         try {
-          const response = await fetch(`${API_BASE_URL}/api/performance/category/update`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user?.token}`,
-            },
-            body: JSON.stringify({
-              category_id: category_id,
-              name: inputName,
-            }),
-          });
+          const response = await fetch(
+            `${API_BASE_URL}/api/performance/category/update`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`,
+              },
+              body: JSON.stringify({
+                category_id: category_id,
+                name: inputName,
+                description: inputDescription,  // Add the description here
+              }),
+            }
+          );
   
           if (!response.ok) {
-            return Swal.showValidationMessage(`Error: ${JSON.stringify(await response.json())}`);
+            return Swal.showValidationMessage(
+              `Error: ${JSON.stringify(await response.json())}`
+            );
           }
   
           const updatedData = await response.json();
@@ -47,7 +62,9 @@ const Category = ({ sport_id }) => {
           // Update the categories state after a successful update
           setCategories((prevCategories) =>
             prevCategories.map((category) =>
-              category.id === category_id ? { ...category, name: inputName } : category
+              category.id === category_id
+                ? { ...category, name: inputName, description: inputDescription }
+                : category
             )
           );
   
@@ -66,6 +83,7 @@ const Category = ({ sport_id }) => {
     });
   };
   
+
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -105,14 +123,21 @@ const Category = ({ sport_id }) => {
   return (
     <div className="grid grid-cols-1 tablet:grid-cols-4 gap-2">
       {categories?.map((category) => (
-        <div
-          key={category?.id}
-          className="shadow p-4 flex border items-center justify-between"
-        >
-          <h1 className="text-lg font-semibold up">{category?.name}</h1>
-          <a onClick={()=> handleCategoryUpdate(category.id, category.name)} href="#" className="text-blue-500 hover:underline">
-            Edit
-          </a>
+        <div className="shadow p-4 border">
+          <div
+            key={category?.id}
+            className="flex items-center justify-between mb-2"
+          >
+            <h1 className="text-lg font-bold uppercase text-primary">{category?.name}</h1>
+            <a
+              onClick={() => handleCategoryUpdate(category.id, category.name, category.description)}
+              href="#"
+              className="text-primary hover:underline"
+            >
+              Edit
+            </a>
+          </div>
+          <p className="p-2 bg-gray-100 text-gray-600 rounded-md">{category.description}</p>
         </div>
       ))}
     </div>
