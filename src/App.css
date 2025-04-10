@@ -13,3 +13,9 @@
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+/* Custom Styles for SweetAlert2 Modal */
+.swal2-container{
+    z-index: 99999999 !important;  /* Ensure the modal appears above everything */
+  }
+  

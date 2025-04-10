@@ -148,10 +148,11 @@ export default function MobileSidebar({ setActiveTab }) {
               Dashboard
             </a>
             <a
+            onClick={() => setActiveTab("announcement")}
               href="#"
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
-              My Activity
+              Announcement
             </a>
             <div className="w-full py-2  border-t-2">
               <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
@@ -181,6 +182,13 @@ export default function MobileSidebar({ setActiveTab }) {
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
               Dashboard
+            </a>
+            <a
+              onClick={() => setActiveTab("events")}
+              href="#"
+              className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
+            >
+              Event Scheduling
             </a>
             <a
               onClick={() => setActiveTab("athletes")}

@@ -8,6 +8,7 @@ import Card from "../shared/Card";
 import SportCard from "../shared/SportCard";
 import SportCardCoach from "../shared/Coaches/SportCard";
 import AnalysisChart from "../shared/AnalysisChart";
+import EventCalendar from "./EventScheduling";
 const user = JSON.parse(localStorage.getItem("sport-science-token"));
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
@@ -24,20 +25,19 @@ const CoachDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
   const fetchAnalysisAthletes = async (s_date, e_date) => {
     try {
       const token = JSON.parse(localStorage.getItem("sport-science-token"));
       console.log("Token:", token); // Debugging
       if (!token || !token.token) return; // Ensure token is valid
-      console.log('ito',s_date, e_date)
-      if(!s_date || !e_date){
-        console.log('empty dates')
-        s_date = "2025-01"
-        e_date = "2025-04"
-      }else{
-        s_date = s_date.slice(0, 7)
-        e_date = e_date.slice(0, 7)
+      console.log("ito", s_date, e_date);
+      if (!s_date || !e_date) {
+        console.log("empty dates");
+        s_date = "2025-01";
+        e_date = "2025-04";
+      } else {
+        s_date = s_date.slice(0, 7);
+        e_date = e_date.slice(0, 7);
       }
       const response = await fetch(
         `${API_BASE_URL}/api/performance/analysis/1?start_month=${s_date}&end_month=${e_date}`,
@@ -72,19 +72,16 @@ const CoachDashboard = () => {
       console.log("Token:", token); // Debugging
       if (!token || !token.token) return; // Ensure token is valid
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/coach/summary-coach`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token.token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/coach/summary-coach`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.token}`,
+        },
+      });
 
       const data = await response.json();
-      console.log("API Response:", data); // Debugging
+      console.log("API Response2:", data); // Debugging
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to fetch total sports");
@@ -107,17 +104,16 @@ const CoachDashboard = () => {
     if (selectedAthlete === "") {
       setFilteredAnalysis(analysis); // Show all data when no filter is selected
     } else {
-      const filtered = analysis.analysis.filter((item) =>
-        item.athlete === selectedAthlete
+      const filtered = analysis.analysis.filter(
+        (item) => item.athlete === selectedAthlete
       );
-      console.log(filtered)
+      console.log(filtered);
       setFilteredAnalysis({
-        'periods': analysis.periods,
-        'analysis':filtered
+        periods: analysis.periods,
+        analysis: filtered,
       });
     }
   }, [selectedAthlete, analysis]);
-
 
   useEffect(() => {
     fetchSummary();
@@ -125,13 +121,11 @@ const CoachDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if(start_date && end_date) {
-      console.log("ginagawa")
+    if (start_date && end_date) {
+      console.log("ginagawa");
       fetchAnalysisAthletes(start_date, end_date);
     }
   }, [start_date, end_date]);
-
- 
 
   const performanceData = {
     // {
@@ -426,12 +420,30 @@ const CoachDashboard = () => {
           </>
         )}
 
+        {activeTab === "events" && (
+          <>
+            <div className="text-2xl font-semibold text-gray-700 mb-6">
+              Manage Training Sessions & Events
+            </div>
+            <div className="grid grid-cols-1 tablet:grid-cols-3 gap-8">
+              {/* Event form... */}
+              {/* <div>
+                  display the other heres
+              </div> */}
+              {/* EventCalendar */}
+              <div className="col-span-3">
+                <EventCalendar assigned={summary}/>
+              </div>
+            </div>
+          </>
+        )}
+
         {activeTab === "athletes" && (
           <>
             <div className="text-2xl font-semibold text-gray-700">
               Welcome to the athletes dashboard!
             </div>
-            
+
             <div className="flex flex-col tablet:flex-row gap-2">
               <div className="flex flex-col gap-2 w-full tablet:w-[20%]">
                 <label htmlFor="start_date">Starting Date</label>

@@ -1,9 +1,10 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import MobileSidebar from "../shared/Sidebar";
 import ProfileManagement from "../shared/ProfileManagement";
 import Card from "../shared/Card";
 import SportCardCoach from "../shared/Coaches/SportCard";
 import SportCardAthlete from "../shared/Athletes/SportCard";
+import EventCalendar from "../athlete/EventScheduling";
 const user = JSON.parse(localStorage.getItem("sport-science-token"));
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
@@ -15,37 +16,40 @@ const AthleteDashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-      const fetchSummary = async () => {
-        try {
-          const token = JSON.parse(localStorage.getItem("sport-science-token"));
-          console.log("Token:", token); // Debugging
-          if (!token || !token.token) return; // Ensure token is valid
-    
-          const response = await fetch(`${API_BASE_URL}/api/athlete/summary-athlete`, {
+    const fetchSummary = async () => {
+      try {
+        const token = JSON.parse(localStorage.getItem("sport-science-token"));
+        console.log("Token:", token); // Debugging
+        if (!token || !token.token) return; // Ensure token is valid
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/athlete/summary-athlete`,
+          {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token.token}`,
             },
-          });
-    
-          const data = await response.json();
-          console.log("API Response:", data); // Debugging
-    
-          if (!response.ok) {
-            throw new Error(data.message || "Failed to fetch total sports");
           }
-    
-          setTotalSummary(data); 
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
+        );
+
+        const data = await response.json();
+        console.log("API Response:", data); // Debugging
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch total sports");
         }
-      };
-    
-      fetchSummary();
-    }, []);
+
+        setTotalSummary(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, []);
 
   return (
     <div className="flex overflow-hidden">
@@ -71,9 +75,27 @@ const AthleteDashboard = () => {
               </h1>
               <div className="grid grid-cols-1 sphone:grid-cols-2 laptop:grid-cols-3 gap-2 p-2">
                 {summary?.assign_sports?.map((sport) => (
-                    // <SportCard key={sport.id} sport={sport} handleOpenModalEdit={}/>
-                    <SportCardAthlete key={sport.id} sport={sport} />
+                  // <SportCard key={sport.id} sport={sport} handleOpenModalEdit={}/>
+                  <SportCardAthlete key={sport.id} sport={sport} />
                 ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === "announcement" && (
+          <>
+            <div className="text-2xl font-semibold text-gray-700 mb-6">
+              Announcement & Events
+            </div>
+            <div className="grid grid-cols-1 tablet:grid-cols-3 gap-8">
+              {/* Event form... */}
+              {/* <div>
+                  display the other heres
+              </div> */}
+              {/* EventCalendar */}
+              <div className="col-span-3">
+                <EventCalendar assigned={summary} />
               </div>
             </div>
           </>
