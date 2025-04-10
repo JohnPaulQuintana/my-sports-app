@@ -65,7 +65,7 @@ const AthleteDashboard = () => {
 
             {/* Dashboard Card */}
             <div className="mb-2">
-              <Card summary={summary} />
+              <Card user={user} summary={summary} />
             </div>
 
             {/* Sport Card */}
