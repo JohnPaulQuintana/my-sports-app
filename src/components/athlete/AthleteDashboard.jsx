@@ -5,15 +5,77 @@ import Card from "../shared/Card";
 import SportCardCoach from "../shared/Coaches/SportCard";
 import SportCardAthlete from "../shared/Athletes/SportCard";
 import EventCalendar from "../athlete/EventScheduling";
+import AnalysisChart from "../shared/AnalysisChart";
 const user = JSON.parse(localStorage.getItem("sport-science-token"));
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
 
 const AthleteDashboard = () => {
-  const [activeTab, setActiveTab] = useState("dashboard"); // Default view is Dashboard
+  const activeSideBar = localStorage.getItem('active-session') || 'dashboard'
+  const [activeTab, setActiveTab] = useState(activeSideBar); // Default view is Dashboard
   const [summary, setTotalSummary] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filteredAnalysis, setFilteredAnalysis] = useState({}); // State for filtered data
+  const [start_date, setStartDate] = useState("2025-01-01");
+  const [end_date, setEndDate] = useState("2025-04-30");
+
+  const fetchAnalysisAthletes = async (sport_id, s_date, e_date) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("sport-science-token"));
+      console.log("Token:", token); // Debugging
+      if (!token || !token.token) return; // Ensure token is valid
+      console.log("ito", s_date, e_date);
+      if (!s_date || !e_date) {
+        console.log("empty dates");
+        s_date = "2025-01";
+        e_date = "2025-04";
+      } else {
+        s_date = s_date.slice(0, 7);
+        e_date = e_date.slice(0, 7);
+      }
+      const response = await fetch(
+        `${API_BASE_URL}/api/performance/analysis/${sport_id}?start_month=${s_date}&end_month=${e_date}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log("Analysis Response:", data); // Debugging
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch analysis");
+      }
+
+      // setAnalysis(data);
+      setFilteredAnalysis(data); // Set initial filtered data as the full dataset
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartDateChange = (e) => {
+    const selectedStartDate = e.target.value; // Format: YYYY-MM-DD
+    // const yearMonthStart = selectedStartDate.slice(0, 7); // Extracts the year and month: YYYY-MM
+    const yearMonthStart = selectedStartDate; // Extracts the year and month: YYYY-MM
+    setStartDate(yearMonthStart);
+  };
+
+  const handleEndDateChange = (e) => {
+    const selectedEndDate = e.target.value; // Format: YYYY-MM-DD
+    // const yearMonthEnd = selectedEndDate.slice(0, 7); // Extracts the year and month: YYYY-MM
+    const yearMonthEnd = selectedEndDate; // Extracts the year and month: YYYY-MM
+    setEndDate(yearMonthEnd);
+  };
+
+   
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -34,12 +96,12 @@ const AthleteDashboard = () => {
         );
 
         const data = await response.json();
-        console.log("API Response:", data); // Debugging
+        console.log("Summary:", data); // Debugging
 
         if (!response.ok) {
           throw new Error(data.message || "Failed to fetch total sports");
         }
-
+        fetchAnalysisAthletes(data.assign_sports[0]?.sport_id, start_date, end_date)
         setTotalSummary(data);
       } catch (err) {
         setError(err.message);
@@ -49,7 +111,8 @@ const AthleteDashboard = () => {
     };
 
     fetchSummary();
-  }, []);
+    // fetchAnalysisAthletes(start_date, end_date);
+  }, [start_date, end_date]);
 
   return (
     <div className="flex overflow-hidden">
@@ -98,6 +161,43 @@ const AthleteDashboard = () => {
                 <EventCalendar assigned={summary} />
               </div>
             </div>
+          </>
+        )}
+
+        {activeTab === "performance" && (
+          <>
+            <div className="text-2xl font-semibold text-gray-700">
+              Welcome to the overall performance dashboard!
+            </div>
+
+            <div className="flex flex-col tablet:flex-row gap-2">
+              <div className="flex flex-col gap-2 w-full tablet:w-[20%]">
+                <label htmlFor="start_date">Starting Date</label>
+                <input
+                  type="date"
+                  name=""
+                  id=""
+                  value={start_date}
+                  className="border p-1 rounded-sm"
+                  onChange={handleStartDateChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2 w-full tablet:w-[20%]">
+                <label htmlFor="start_date">End Date (current month)</label>
+                <input
+                  type="date"
+                  name=""
+                  id=""
+                  value={end_date}
+                  className="border p-1"
+                  onChange={handleEndDateChange}
+                />
+              </div>
+
+              
+            </div>
+
+            <AnalysisChart data={filteredAnalysis} />
           </>
         )}
 

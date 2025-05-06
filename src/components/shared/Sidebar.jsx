@@ -141,18 +141,31 @@ export default function MobileSidebar({ setActiveTab }) {
         {getUserRole() === "athlete" && (
           <nav className="p-4">
             <a
-              onClick={() => setActiveTab("dashboard")}
+              onClick={() => {
+                localStorage.setItem('active-session','dashboard')
+                setActiveTab("dashboard")}}
               href="#"
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
               Dashboard
             </a>
             <a
-            onClick={() => setActiveTab("announcement")}
+            onClick={() => {
+              localStorage.setItem('active-session','announcement')
+              setActiveTab("announcement")}}
               href="#"
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
               Announcement
+            </a>
+            <a
+              onClick={() => {
+                localStorage.setItem('active-session','performance')
+                setActiveTab("performance")}}
+                href="#"
+               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
+            >
+              Overall Performance
             </a>
             <div className="w-full py-2  border-t-2">
               <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
@@ -177,21 +190,27 @@ export default function MobileSidebar({ setActiveTab }) {
         {getUserRole() === "coach" && (
           <nav className="p-4">
             <a
-              onClick={() => setActiveTab("dashboard")}
+              onClick={() => {
+                localStorage.setItem('active-session','dashboard')
+                setActiveTab("dashboard")}}
               href="#"
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
               Dashboard
             </a>
             <a
-              onClick={() => setActiveTab("events")}
+              onClick={() => {
+                localStorage.setItem('active-session','events')
+                setActiveTab("events")}}
               href="#"
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
               Event Scheduling
             </a>
             <a
-              onClick={() => setActiveTab("athletes")}
+              onClick={() => {
+                localStorage.setItem('active-session','athletes')
+                setActiveTab("athletes")}}
               href="#"
               className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
             >
@@ -200,7 +219,9 @@ export default function MobileSidebar({ setActiveTab }) {
             <div className="w-full py-2  border-t-2">
               <span className="px-4 text-gray-400 text-sm">Manage Profile</span>
               <a
-                onClick={() => setActiveTab("profile")}
+                onClick={() => {
+                  localStorage.setItem('active-session','profile')
+                  setActiveTab("profile")}}
                 href="#"
                 className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded"
               >

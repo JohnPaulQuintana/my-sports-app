@@ -13,12 +13,14 @@ const user = JSON.parse(localStorage.getItem("sport-science-token"));
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
 
+
 const CoachDashboard = () => {
   const [start_date, setStartDate] = useState("2025-01-01");
   const [end_date, setEndDate] = useState("2025-04-30");
   const [selectedAthlete, setSelectedAthlete] = useState(""); // For the selected athlete
-
-  const [activeTab, setActiveTab] = useState("dashboard"); // Default view is Dashboard
+  const activeSideBar = localStorage.getItem('active-session') || 'dashboard'
+  console.log(activeSideBar)
+  const [activeTab, setActiveTab] = useState(activeSideBar); // Default view is Dashboard
   const [summary, setTotalSummary] = useState(0);
   const [analysis, setAnalysis] = useState({});
   const [filteredAnalysis, setFilteredAnalysis] = useState({}); // State for filtered data
@@ -381,6 +383,7 @@ const CoachDashboard = () => {
     const yearMonthStart = selectedStartDate; // Extracts the year and month: YYYY-MM
     setStartDate(yearMonthStart);
   };
+
   const handleEndDateChange = (e) => {
     const selectedEndDate = e.target.value; // Format: YYYY-MM-DD
     // const yearMonthEnd = selectedEndDate.slice(0, 7); // Extracts the year and month: YYYY-MM

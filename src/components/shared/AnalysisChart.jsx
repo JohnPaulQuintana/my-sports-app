@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import html2canvas from "html2canvas";
+import Swal from "sweetalert2";
 import jsPDF from "jspdf";
 import {
   Chart as ChartJS,
@@ -14,7 +15,9 @@ import {
   Filler,
 } from "chart.js";
 import { Bar, Radar } from "react-chartjs-2";
-
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8001";
+const user = JSON.parse(localStorage.getItem("sport-science-token"));
 // Register ChartJS components
 ChartJS.register(
   BarElement,
@@ -29,10 +32,10 @@ ChartJS.register(
 );
 
 const AnalysisChart = ({ data }) => {
-  console.log(data.analysis);
-  const [totalRecord, setTotalRecords] = useState(0)
+  console.log(data);
+  const [totalRecord, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { current, previous } = data.periods;
+  const { current, previous } = data?.periods;
 
   const prepareAthleteData = (athleteData) => {
     const metrics = Object.keys(athleteData.performance);
@@ -51,7 +54,7 @@ const AnalysisChart = ({ data }) => {
       }
     });
 
-    // console.log(metrics);
+    console.log(metrics);
 
     const currentAverages = metrics.map(
       (metric) => athleteData.performance[metric].current_period.average
@@ -116,34 +119,215 @@ const AnalysisChart = ({ data }) => {
     },
   };
 
-  const PrintDiv = ()=> {
-    var contents = document.getElementById("contents").innerHTML;
-    var frame1 = document.createElement('iframe');
-    frame1.name = "frame1";
-    frame1.style.position = "absolute";
-    frame1.style.top = "-1000000px";
-    document.body.appendChild(frame1);
-    var frameDoc = (frame1.contentWindow) ? frame1.contentWindow : (frame1.contentDocument.document) ? frame1.contentDocument.document : frame1.contentDocument;
-    frameDoc.document.open();
-    frameDoc.document.write(`<html><head><title>DIV Contents</title>`);
-        // Copy stylesheets from main document to iframe
-        var styles = document.querySelectorAll('link');
-        styles.forEach(function(style) {
-            frameDoc.document.write(style.outerHTML);
-        });
-    frameDoc.document.write('</head><body>');
-    frameDoc.document.write(contents);
-    frameDoc.document.write('</body></html>');
-    frameDoc.document.close();
-    setTimeout(function () {
-        window.frames["frame1"].focus();
-        window.frames["frame1"].print();
-        document.body.removeChild(frame1);
-    }, 500);
-    return false;
-}
+  // delete recommendation
+  const handleDeleteRecom = (r_id, recom) => {
+    // alert(r_id)
+    Swal.fire({
+      title: "Delete Recommendation",
+      html: `
+          <div class="flex flex-col gap-2">
+              <!-- Recommendation Input -->
+              <div class="flex flex-col gap-1">
+                <label for="recommendation" class="">Recommendation</label>
+                <textarea 
+                  id="recommendation_delete" 
+                  placeholder="Enter your recommendation to enhance performance..." 
+                  class="border p-2 rounded-sm min-h-[100px] resize-y"
+                >${recom}</textarea>
+              </div>
 
-const handlePrint = async () => {
+          </div>
+        `,
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/coach/recommendation/delete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`,
+              },
+              body: JSON.stringify({
+                recom_id: r_id,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            return Swal.showValidationMessage(
+              `Error: ${JSON.stringify(await response.json())}`
+            );
+          }
+
+          return response.json();
+        } catch (error) {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        }
+      },
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Successfully added!`,
+          // imageUrl: result.value.avatar_url
+        });
+
+        localStorage.setItem('active-session','dashboard')
+        window.location.href = '/dashboard'
+      }
+    });
+  }
+  // edit recommendation
+  const handleEditRecom = (r_id, recom) => {
+    // alert(r_id)
+    Swal.fire({
+      title: "Edit Recommendation",
+      html: `
+          <div class="flex flex-col gap-2">
+              <!-- Recommendation Input -->
+              <div class="flex flex-col gap-1">
+                <label for="recommendation" class="">Recommendation</label>
+                <textarea 
+                  id="recommendation_edit" 
+                  placeholder="Enter your recommendation to enhance performance..." 
+                  class="border p-2 rounded-sm min-h-[100px] resize-y"
+                >${recom}</textarea>
+              </div>
+
+          </div>
+        `,
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        const recommendation_edit = document.getElementById("recommendation_edit").value;
+        if (!recommendation_edit) {
+          return Swal.showValidationMessage(
+            "Please give recommendation to athlete before sending it..."
+          );
+        }
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/coach/recommendation/update`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`,
+              },
+              body: JSON.stringify({
+                recom_id: r_id,
+                recommendation: recommendation_edit,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            return Swal.showValidationMessage(
+              `Error: ${JSON.stringify(await response.json())}`
+            );
+          }
+
+          return response.json();
+        } catch (error) {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        }
+      },
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Successfully added!`,
+          // imageUrl: result.value.avatar_url
+        });
+
+        localStorage.setItem('active-session','dashboard')
+        window.location.href = '/dashboard'
+      }
+    });
+  }
+  // adding recommendation
+  const handleRecommendation = (label, sport, athelete_id) => {
+    console.log(athelete_id, label, sport);
+    Swal.fire({
+      title: "Recommendation to Athlete",
+      html: `
+          <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-2 items-center">
+                <label>Selected Category</label>
+                <input value="${label}" class="border p-2 rounded-sm text-center" readonly/>
+              </div>
+
+              <!-- Recommendation Input -->
+              <div class="flex flex-col gap-1">
+                <label for="recommendation" class="">Recommendation</label>
+                <textarea 
+                  id="recommendation" 
+                  placeholder="Enter your recommendation to enhance performance..." 
+                  class="border p-2 rounded-sm min-h-[100px] resize-y"
+                ></textarea>
+              </div>
+
+          </div>
+        `,
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        const recommendation = document.getElementById("recommendation").value;
+        if (!recommendation) {
+          return Swal.showValidationMessage(
+            "Please give recommendation to athlete before sending it..."
+          );
+        }
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/coach/recommendation`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`,
+              },
+              body: JSON.stringify({
+                athlete_id: athelete_id,
+                category: label,
+                recommendation: recommendation,
+                sport: sport,
+                // sport_id: sport_id,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            return Swal.showValidationMessage(
+              `Error: ${JSON.stringify(await response.json())}`
+            );
+          }
+
+          return response.json();
+        } catch (error) {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        }
+      },
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Successfully added!`,
+          // imageUrl: result.value.avatar_url
+        });
+      }
+    });
+  };
+  const handlePrint = async () => {
     setLoading(true);
 
     try {
@@ -153,10 +337,10 @@ const handlePrint = async () => {
       let currentY = 15; // Start at the top of the page
 
       // Loop over each athlete and capture the card
-      for (let i = 0; i < data.analysis.length ; i++) {
-        console.log(i)
+      for (let i = 0; i < data.analysis.length; i++) {
+        console.log(i);
         const card = document.getElementById(`athlete-card-${i}`);
-        
+
         // Use html2canvas to capture the content of the card as an image
         const canvas = await html2canvas(card, { scale: 1 });
         const imgData = canvas.toDataURL("image/png");
@@ -178,7 +362,6 @@ const handlePrint = async () => {
 
       // Save the PDF
       pdf.save("athlete-performance-report.pdf");
-
     } catch (error) {
       console.error("Error generating PDF", error);
     } finally {
@@ -186,7 +369,7 @@ const handlePrint = async () => {
     }
   };
   return (
-    <div  className="performance-dashboard">
+    <div className="performance-dashboard">
       <div className="py-2">
         {/* <h2 className="text-xl font-semibold text-gray-700 py-2">
           Athletic Performance Analysis ({current} vs {previous})
@@ -211,7 +394,7 @@ const handlePrint = async () => {
       <div id="contents">
         {data.analysis.map((athlete, index) => {
           const chartData = prepareAthleteData(athlete);
-          // console.log(chartData);
+          console.log(chartData);
           const barData = {
             labels: chartData.labels,
             datasets: [
@@ -264,12 +447,14 @@ const handlePrint = async () => {
               id={`athlete-card-${index}`}
               className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 w-full"
             >
-            <div className="flex flex-col mb-4 items-center justify-center w-full">
+              <div className="flex flex-col mb-4 items-center justify-center w-full">
                 <h2 className="text-2xl font-bold text-gray-700 py-2">
-                Athletic Performance Analysis Report
+                  Athletic Performance Analysis Report
                 </h2>
-                <p className="text-gray-600">Performed Date : {current} vs {previous}</p>
-            </div>
+                <p className="text-gray-600">
+                  Performed Date : {current} vs {previous}
+                </p>
+              </div>
               {/* Card Header */}
               <div className="px-5 py-1 bg-gradient-to-r from-primary to-green-700">
                 <h3 className="text-lg font-semibold text-white">
@@ -386,10 +571,52 @@ const handlePrint = async () => {
                         >
                           {improvement > 0 ? "+" : ""}
                           {improvement}%
+                          {(declined || noChange) && (
+                            <button
+                              onClick={() => {
+                                handleRecommendation(
+                                  label,
+                                  athlete?.sport,
+                                  athlete?.athlete_id
+                                );
+                              }}
+                              type="button"
+                              className={`ms-2 border text-xs bg-red-500 text-white p-1 rounded-md ${user.user.role === 'athlete' ? 'hidden' : ''}`}
+                            >
+                              +Recommendation
+                            </button>
+                          )}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
                           {current} vs {previous}
                         </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* recommendations */}
+              <div className="px-4 py-6 sphone:px-6">
+                <h4 className="text-sm font-medium text-gray-500 mb-2">
+                  RECOMMENDATIONS
+                </h4>
+
+                <div className="flex flex-col gap-1">
+                  {athlete?.recommendations.map((r) => {
+                    // console.log()
+                    return (
+                      <div key={r?.id} className="border p-1 bg-gray-200">
+                        <div className="flex gap-2 items-center justify-between">
+                          <p className="ps-1 font-semibold w-fit bg-red-200 p-1">{r?.category}</p>
+                          {user?.user?.role === 'coach' && (
+                            <div>
+                            <button onClick={()=>handleDeleteRecom(r?.id, r?.recommendation)} type="button" className="text-red-600 p-1 rounded-md hover:text-red-700">Delete</button>
+                            <button onClick={()=>handleEditRecom(r?.id, r?.recommendation)} type="button" className="text-red-600 p-1 rounded-md hover:text-red-700">Edit</button>
+                            </div>
+                          )}
+                        </div>
+                        <p>• {r?.recommendation}</p>
                       </div>
                     );
                   })}

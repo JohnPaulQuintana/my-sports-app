@@ -85,6 +85,7 @@ export default function MobileSidebarSub({setActiveTab}) {
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
                 )}
+
                 {getUserRole() === 'athlete' && (
                     <nav className="p-4">
                         <Link to="/athlete" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</Link>
@@ -92,7 +93,9 @@ export default function MobileSidebarSub({setActiveTab}) {
                         {/* <a  onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
                         <div className="w-full py-2  border-t-2">
                             <span className="px-4 text-gray-400 text-sm">Communication</span>
-                            <a onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
+                            <a onClick={() => {
+                                localStorage.setItem('active-session','groupchat')
+                                setActiveTab("groupchat")}} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
                         </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-red-500">Logout</a>
                     </nav>
@@ -101,15 +104,21 @@ export default function MobileSidebarSub({setActiveTab}) {
                 {getUserRole() === 'coach' && (
                     <nav className="p-4">
                         <Link to="/coach" className="block py-2 px-4 text-secondary hover:bg-gray-200 rounded">Back to Home</Link>
-                        <a onClick={() => setActiveTab("dashboard")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
+                        <a onClick={() => {
+                            localStorage.setItem('active-session','dashboard')
+                            setActiveTab("dashboard")}} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Dashboard</a>
                         {/* <a  onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Athletes</a> */}
                         <div className="w-full py-2  border-t-2">
                             <span className="px-4 text-gray-400 text-sm">Category</span>
-                            <a onClick={() => setActiveTab("category")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Category Score</a>
+                            <a onClick={() => {
+                                 localStorage.setItem('active-session','category')
+                                setActiveTab("category")}} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Category Score</a>
                         </div>
                         <div className="w-full py-2  border-t-2">
                             <span className="px-4 text-gray-400 text-sm">Communication</span>
-                            <a onClick={() => setActiveTab("groupchat")} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
+                            <a onClick={() => {
+                                 localStorage.setItem('active-session','groupchat')
+                                setActiveTab("groupchat")}} href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200 rounded">Group Chat</a>
                         </div>
                         <a href="#" onClick={handleLogout} className="block py-2 px-4 hover:bg-gray-200 rounded absolute bottom-20 text-secondary">Logout</a>
                     </nav>

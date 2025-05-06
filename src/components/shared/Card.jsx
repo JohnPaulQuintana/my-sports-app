@@ -1,7 +1,7 @@
 import React from "react";
 
 const Card = ({ user, summary }) => {
-  console.log(user);
+  console.log("SUmmary", summary);
 
   return (
     <div className="grid grid-cols-1 sphone:grid-cols-2 laptop:grid-cols-3 gap-2">

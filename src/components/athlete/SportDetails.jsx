@@ -145,16 +145,16 @@ const SportDetails = () => {
                 </div>
                 <div className="border border-primary p-2 flex items-center flex-col">
                   <h1 className="font-extrabold text-xl text-secondary">0</h1>
-                  <span>Activities</span>
+                  <span>Session's</span>
                 </div>
-                <div className="border border-primary p-2 flex items-center flex-col">
+                {/* <div className="border border-primary p-2 flex items-center flex-col">
                   <h1 className="font-extrabold text-xl text-secondary">0</h1>
-                  <span>Messages</span>
-                </div>
+                  <span className="break-words text-center max-w-[100px]">Recommendation</span>
+                </div> */}
               </div>
             </div>
             <div className="shadow col-span-2 p-4">
-              <h1>Athlete Performance Chart</h1>
+              <h1>Athlete Performance category Chart</h1>
               <PerformanceChart sport_id={id}/>
             </div>
           </div>

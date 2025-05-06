@@ -15,7 +15,9 @@ const API_BASE_URL =
 
 const SportDetails = () => {
   const { id } = useParams(); // Extract the dynamic id from the URL
-  const [activeTab, setActiveTab] = useState("dashboard"); // Default view is Dashboard
+  const activeSideBar = localStorage.getItem('active-session') || 'dashboard'
+  console.log(activeSideBar)
+  const [activeTab, setActiveTab] = useState(activeSideBar); // Default view is Dashboard
   const [sport, setSport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -168,7 +170,7 @@ const SportDetails = () => {
 
         try {
           const response = await fetch(
-            `${API_BASE_URL}/api/athlete/assign-sport`,
+            `${API_BASE_URL}/api/coach/assign-sport`,
             {
               method: "POST",
               headers: {
@@ -201,6 +203,8 @@ const SportDetails = () => {
           title: `Successfully added!`,
           // imageUrl: result.value.avatar_url
         });
+
+        window.location.reload();
       }
     });
   };
